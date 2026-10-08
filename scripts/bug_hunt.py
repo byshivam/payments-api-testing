@@ -40,7 +40,7 @@ REPORTS = ROOT / "reports"
 TARGET = ROOT / "target"
 README = ROOT / "README.md"
 START, END = "<!-- RESULTS:START -->", "<!-- RESULTS:END -->"
-LAYER_ORDER = ["API", "DB", "Concurrency", "Contract"]
+LAYER_ORDER = ["BDD", "API", "DB", "Concurrency", "Contract"]
 
 
 def free_port() -> int:
@@ -64,8 +64,12 @@ def wait_healthy(url: str, proc: subprocess.Popen, timeout: float = 30) -> None:
 
 
 def layer_of(result: dict) -> str:
-    tags = {l["value"].lower() for l in result.get("labels", []) if l.get("name") == "tag"}
+    labels = result.get("labels", [])
+    tags = {l["value"].lower().lstrip("@") for l in labels if l.get("name") == "tag"}
     full = result.get("fullName", "")
+    framework = " ".join(l["value"].lower() for l in labels if l.get("name") == "framework")
+    if "bdd" in tags or "cucumber" in framework:
+        return "BDD"
     if "concurrency" in tags or "ConcurrencyTest" in full:
         return "Concurrency"
     if "contract" in tags or ".contract." in full:

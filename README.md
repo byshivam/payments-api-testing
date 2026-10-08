@@ -8,6 +8,7 @@ The API (FastAPI + SQLite) is built in this repo so the tests can reach every la
 
 | Layer | Tooling | What it proves |
 |---|---|---|
+| BDD | Cucumber (Gherkin) + RestAssured + PicoContainer | Business flows in plain language: transfer, retries, refunds, end-of-day reconciliation |
 | API | RestAssured + JUnit 5 | Status codes, error codes, money moves exactly, boundaries at the paisa |
 | Idempotency | RestAssured + parallel threads | A retried payment debits once, even when 10 retries arrive together |
 | Database | JDBC + SQLite | Double-entry ledger balances; stored balance = credits − debits; money is conserved |
@@ -90,6 +91,24 @@ _Last run: 08 Oct 2026 12:09 UTC_
 </details>
 <!-- RESULTS:END -->
 
+## BDD scenarios
+
+The business-critical flows are also written as Cucumber scenarios in [`src/test/resources/features`](src/test/resources/features), so a product owner can read what is covered:
+
+```gherkin
+Scenario: A retried payment is charged once
+  When Asha sends 100.00 to Ravi with idempotency key "rent-october"
+  And the app retries the same payment with idempotency key "rent-october"
+  Then both responses show the same transfer
+  And Asha's balance is 900.00
+  And there is 1 transfer from Asha to Ravi
+```
+
+- **Test data:** every scenario creates its own accounts through the API in its `Given` steps; there is no shared fixture file. A `ScenarioContext` (injected by PicoContainer) maps the names in the scenario ("Asha", "Ravi") to the account ids the API returned, and makes idempotency keys unique per scenario.
+- **Same building blocks:** the step definitions reuse the JUnit suite's API client and JDBC ledger queries, so `Then` steps check both the API and the database.
+- **One run, one report:** the Cucumber engine runs on the JUnit Platform inside `mvn verify`, and scenarios appear in the same Allure report (feature → scenario → steps).
+- **Where BDD stops:** edge-case matrices, concurrency and contract tests stay in plain JUnit, where they're shorter and clearer.
+
 ## How the bug hunt works
 
 A test suite that has never failed hasn't proven anything. So the API ships with seven realistic payment defects, each behind a switch (`PLANTED_BUGS=BUG-03`). CI runs the whole suite:
@@ -129,7 +148,9 @@ Money is stored as integer paise and sent as strings (`"250.00"`). Errors are al
 
 ```
 app/arya_payments/          FastAPI app (system under test) + planted bugs
+src/test/resources/features/ Gherkin scenarios (transfers, retries, refunds, reconciliation)
 src/test/java/com/aryabank/payments/
+  bdd/                      Cucumber runner, step definitions, scenario context
   api/                      RestAssured tests: accounts, transfers, validation,
                             idempotency, refunds, concurrency
   db/                       Whole-database reconciliation (runs last)
