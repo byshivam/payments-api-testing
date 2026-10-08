@@ -98,6 +98,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add README.md reports/summary.json reports/BUG_HUNT.md reports/k6-summary.json
           git diff --cached --quiet || git commit -m "Refresh test results [skip ci]"
+          git pull --rebase origin main
           git push
 
       - name: Fail if the clean build failed, a bug escaped, or k6 thresholds failed
