@@ -1,0 +1,20 @@
+# Maven / Java
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local runs
+work/
+*.db
+*.db-wal
+*.db-shm
+reports/allure-results/
+reports/runs.json
+site/

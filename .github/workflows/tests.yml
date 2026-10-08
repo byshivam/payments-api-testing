@@ -1,0 +1,118 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 22 * * *" # nightly, 03:47 IST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      problems: ${{ steps.hunt.outputs.problems }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: app/requirements.txt
+      - run: pip install -r app/requirements.txt
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - uses: grafana/setup-k6-action@v1
+
+      - name: Compile tests
+        run: mvn -B -ntp test-compile
+
+      - name: Load test (k6, clean build)
+        id: load
+        continue-on-error: true
+        run: |
+          mkdir -p work reports
+          ARYA_DB_PATH=work/load.db python -m uvicorn arya_payments.main:app --app-dir app --port 8000 --log-level warning &
+          for i in $(seq 1 30); do curl -sf localhost:8000/health >/dev/null && break; sleep 1; done
+          k6 run --quiet -e BASE_URL=http://localhost:8000 --summary-export reports/k6-summary.json load/transfers.js
+          kill %1
+
+      - name: Bug hunt (clean build + each planted bug + all bugs)
+        id: hunt
+        run: |
+          if python scripts/bug_hunt.py --update-readme; then
+            echo "problems=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "problems=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Allure reports and dashboard
+        if: always()
+        run: |
+          npm install -g allure-commandline@2 --silent
+          mkdir -p site
+          for run in clean all; do
+            if [ -d "reports/allure-results/$run" ]; then
+              allure generate "reports/allure-results/$run" -o "site/$run" --clean
+            fi
+          done
+          python scripts/build_site.py
+
+      - name: Keep run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-logs
+          path: |
+            work/*.log
+            reports/
+          retention-days: 14
+
+      - name: Upload dashboard
+        if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Commit refreshed README results
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md reports/summary.json reports/BUG_HUNT.md reports/k6-summary.json
+          git diff --cached --quiet || git commit -m "Refresh test results [skip ci]"
+          git push
+
+      - name: Fail if the clean build failed, a bug escaped, or k6 thresholds failed
+        if: steps.hunt.outputs.problems == 'true' || steps.load.outcome == 'failure'
+        run: |
+          echo "::error::Clean build had failures, a planted bug was not caught, or the load test failed. See the job summary."
+          exit 1
+
+  deploy:
+    needs: test
+    if: always() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && needs.test.result != 'cancelled'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4
