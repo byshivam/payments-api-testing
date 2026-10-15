@@ -1,11 +1,11 @@
 # Bug hunt
 
-_Last run: 14 Oct 2026 01:17 UTC_
+_Last run: 15 Oct 2026 00:35 UTC_
 
 **Clean build:** 77/77 tests passed (no false alarms).  
 **Planted bugs caught:** 7/7.  
 **Release candidate with every bug on:** 35 of 77 tests fail.  
-**Load (k6):** 1221 requests, p95 5 ms, 0.00% errors, money conserved.  
+**Load (k6):** 1221 requests, p95 3 ms, 0.00% errors, money conserved.  
 
 | Bug | What it does | Result | Caught by | Failing tests |
 |---|---|---|---|---|
@@ -21,31 +21,31 @@ _Last run: 14 Oct 2026 01:17 UTC_
 
 **BUG-01 — Idempotency key ignored.** A retried payment (same Idempotency-Key) debits the customer twice.
 
-- `API` Retry with the same key returns the original transfer and debits once
-- `BDD` A key can't be reused for a different payment
-- `BDD` A retried payment is charged once
 - `DB` A retried request leaves exactly one transfer row in the database
-- `Concurrency` 10 parallel retries with one key create exactly one transfer
+- `BDD` A retried payment is charged once
+- `API` Retry with the same key returns the original transfer and debits once
 - `API` Same key with a different amount is rejected with 409 and nothing moves
+- `BDD` A key can't be reused for a different payment
+- `Concurrency` 10 parallel retries with one key create exactly one transfer
 
 **BUG-02 — Funds check compares whole rupees only.** Balance 500.50 can send 500.90; the account goes negative.
 
-- `BDD` A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]
 - `API` Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.90 → 422 INSUFFICIENT_FUNDS
-- `BDD` A transfer the payer can't afford is rejected and nothing moves [0.00, 0.01]
-- `DB` No customer account is negative
-- `API` Insufficient funds is rejected at the paisa boundary and no money moves balance 0.00, send 0.01 → 422 INSUFFICIENT_FUNDS
-- `API` Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.51 → 422 INSUFFICIENT_FUNDS
 - `BDD` A transfer the payer can't afford is rejected and nothing moves [500.50, 500.90]
+- `DB` No customer account is negative
+- `BDD` A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]
+- `API` Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.51 → 422 INSUFFICIENT_FUNDS
+- `API` Insufficient funds is rejected at the paisa boundary and no money moves balance 0.00, send 0.01 → 422 INSUFFICIENT_FUNDS
+- `BDD` A transfer the payer can't afford is rejected and nothing moves [0.00, 0.01]
 
 **BUG-03 — Negative amounts accepted.** A transfer of -100.00 pulls money from the receiver.
 
-- `API` Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance "-5.00" is rejected
-- `DB` No customer account is negative
 - `DB` No ledger entry has a zero or negative amount
-- `BDD` Invalid amounts are rejected [-100.00]
-- `API` Invalid amounts are rejected and no money moves amount "-100.00" → 422 INVALID_AMOUNT, no money moves
+- `API` Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance "-5.00" is rejected
 - `API` Invalid amounts are rejected and no money moves amount "-0.01" → 422 INVALID_AMOUNT, no money moves
+- `API` Invalid amounts are rejected and no money moves amount "-100.00" → 422 INVALID_AMOUNT, no money moves
+- `DB` No customer account is negative
+- `BDD` Invalid amounts are rejected [-100.00]
 
 **BUG-04 — Transfer can be refunded twice.** Sender gets the money back twice.
 
@@ -54,14 +54,14 @@ _Last run: 14 Oct 2026 01:17 UTC_
 
 **BUG-05 — Refund never debits the receiver.** Refund creates money; the double-entry ledger no longer balances.
 
-- `DB` Money is conserved: all balances (incl. the funding account) sum to 0.00
-- `BDD` A day of payments and a refund leaves the books balanced
-- `DB` Refund does not create money: payer + payee total is unchanged
-- `DB` Every transaction's debits equal its credits
-- `BDD` A refund returns the money to the payer
-- `DB` Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger
-- `API` Refund returns the money and marks the transfer REFUNDED
 - `BDD` A transfer can't be refunded twice
+- `DB` Every transaction's debits equal its credits
+- `BDD` A day of payments and a refund leaves the books balanced
+- `DB` Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger
+- `DB` Refund does not create money: payer + payee total is unchanged
+- `DB` Money is conserved: all balances (incl. the funding account) sum to 0.00
+- `API` Refund returns the money and marks the transfer REFUNDED
+- `API` A transfer cannot be refunded twice
 - … and 1 more
 
 **BUG-06 — Contract drift on account balance.** balance returned as a JSON number (1000.5) instead of a string ("1000.50").
@@ -73,10 +73,10 @@ _Last run: 14 Oct 2026 01:17 UTC_
 
 **BUG-07 — Lost update under concurrent transfers.** Balance is read outside the transaction and written back; parallel payments overwrite each other.
 
+- `Concurrency` After parallel transfers the stored balances still match the ledger
 - `DB` Every account's stored balance equals credits minus debits in the ledger
 - `BDD` A day of payments and a refund leaves the books balanced
 - `Concurrency` 25 parallel transfers of 10.00: every rupee is accounted for
-- `Concurrency` After parallel transfers the stored balances still match the ledger
 - `Concurrency` 20 parallel transfers of 10.00 from 100.00: exactly 10 succeed, never negative
 
 </details>
