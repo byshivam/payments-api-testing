@@ -3,7 +3,7 @@
     "run": "clean",
     "planted_bugs": "none",
     "maven_exit": 0,
-    "duration_s": 22.3,
+    "duration_s": 19.9,
     "total": 77,
     "passed": 77,
     "failed": 0,
@@ -16,7 +16,7 @@
     "run": "BUG-01",
     "planted_bugs": "BUG-01",
     "maven_exit": 0,
-    "duration_s": 20.8,
+    "duration_s": 18.4,
     "total": 77,
     "passed": 71,
     "failed": 6,
@@ -27,11 +27,11 @@
         "full_name": "features/idempotency.feature:10",
         "layer": "BDD",
         "status": "failed",
-        "message": "a retry with the same key must return the original transfer ==> expected: <TXNC641DF65442B> but was: <TXNA1C828C8E7CA>"
+        "message": "a retry with the same key must return the original transfer ==> expected: <TXNBEB53E8BA423> but was: <TXN2B93ABE9E60B>"
       },
       {
-        "name": "Same key with a different amount is rejected with 409 and nothing moves",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.sameKeyDifferentBody",
+        "name": "Retry with the same key returns the original transfer and debits once",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.retryDebitsOnce",
         "layer": "API",
         "status": "failed",
         "message": "1 expectation failed."
@@ -51,8 +51,8 @@
         "message": "expected: <IDEMPOTENCY_CONFLICT> but was: <INSUFFICIENT_FUNDS>"
       },
       {
-        "name": "Retry with the same key returns the original transfer and debits once",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.retryDebitsOnce",
+        "name": "Same key with a different amount is rejected with 409 and nothing moves",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.sameKeyDifferentBody",
         "layer": "API",
         "status": "failed",
         "message": "1 expectation failed."
@@ -62,7 +62,7 @@
         "full_name": "com.aryabank.payments.api.IdempotencyTest.parallelRetries",
         "layer": "Concurrency",
         "status": "failed",
-        "message": "all retries should return the same transfer id, got [TXN667650F631F5, TXNA7900EF5EC39, TXN2BCE0092C45D, TXN24C32D90CA77, TXNE3B56F7F9D94, TXN4380209EE93D, TXN94EF663F103C, TXNDD4D0C254425, TXNE8FC0D35A1AC, TXN384FCA4BEC66] ==> expected: <1> but was: <10>"
+        "message": "all retries should return the same transfer id, got [TXN8E3E75A5B25D, TXN94DB9BBC098C, TXNE58E9275DE2C, TXN3CE128577171, TXN92367457912D, TXN23E84A8DD15F, TXN2F150E9455E7, TXN4F33C42BF2BB, TXN207314B16F8D, TXN940F8317B739] ==> expected: <1> but was: <10>"
       }
     ],
     "failed_layers": [
@@ -77,39 +77,25 @@
     "run": "BUG-02",
     "planted_bugs": "BUG-02",
     "maven_exit": 0,
-    "duration_s": 20.4,
+    "duration_s": 18.4,
     "total": 77,
     "passed": 70,
     "failed": 7,
     "skipped": 0,
     "failed_tests": [
       {
-        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]",
-        "full_name": "features/transfers.feature:33",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN14DBB2CE1CCE\",\"from_account\":\"AB000099\",\"to_account\":\"AB000098\",\"amount\":\"500.51\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:29:30.984Z\"} ==> expected: <true> but was: <false>"
-      },
-      {
-        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.90]",
-        "full_name": "features/transfers.feature:34",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN066999220AB1\",\"from_account\":\"AB000102\",\"to_account\":\"AB000101\",\"amount\":\"500.90\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:29:31.057Z\"} ==> expected: <true> but was: <false>"
-      },
-      {
-        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.90 \u2192 422 INSUFFICIENT_FUNDS",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
         "name": "No customer account is negative",
         "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNegativeBalances",
         "layer": "DB",
         "status": "failed",
         "message": "customer accounts below zero ==> expected: <[]> but was: <[AB000027, AB000029, AB000031]>"
+      },
+      {
+        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.51 \u2192 422 INSUFFICIENT_FUNDS",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
       },
       {
         "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 0.00, send 0.01 \u2192 422 INSUFFICIENT_FUNDS",
@@ -119,7 +105,7 @@
         "message": "1 expectation failed."
       },
       {
-        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.51 \u2192 422 INSUFFICIENT_FUNDS",
+        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.90 \u2192 422 INSUFFICIENT_FUNDS",
         "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
         "layer": "API",
         "status": "failed",
@@ -130,7 +116,21 @@
         "full_name": "features/transfers.feature:35",
         "layer": "BDD",
         "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNBA876BAEF24D\",\"from_account\":\"AB000105\",\"to_account\":\"AB000104\",\"amount\":\"0.01\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:29:31.145Z\"} ==> expected: <true> but was: <false>"
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNBE9A454C0C92\",\"from_account\":\"AB000105\",\"to_account\":\"AB000104\",\"amount\":\"0.01\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:26:46.098Z\"} ==> expected: <true> but was: <false>"
+      },
+      {
+        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]",
+        "full_name": "features/transfers.feature:33",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNFC6B1EA251F7\",\"from_account\":\"AB000099\",\"to_account\":\"AB000098\",\"amount\":\"500.51\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:26:45.961Z\"} ==> expected: <true> but was: <false>"
+      },
+      {
+        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.90]",
+        "full_name": "features/transfers.feature:34",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNE885F5585503\",\"from_account\":\"AB000102\",\"to_account\":\"AB000101\",\"amount\":\"500.90\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:26:46.024Z\"} ==> expected: <true> but was: <false>"
       }
     ],
     "failed_layers": [
@@ -144,36 +144,15 @@
     "run": "BUG-03",
     "planted_bugs": "BUG-03",
     "maven_exit": 0,
-    "duration_s": 21.0,
+    "duration_s": 18.0,
     "total": 77,
     "passed": 71,
     "failed": 6,
     "skipped": 0,
     "failed_tests": [
       {
-        "name": "Invalid amounts are rejected and no money moves amount \"-0.01\" \u2192 422 INVALID_AMOUNT, no money moves",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Invalid amounts are rejected [-100.00]",
-        "full_name": "features/transfers.feature:45",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN462474D7CF0E\",\"from_account\":\"AB000109\",\"to_account\":\"AB000110\",\"amount\":\"-100.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:29:52.367Z\"} ==> expected: <true> but was: <false>"
-      },
-      {
-        "name": "No ledger entry has a zero or negative amount",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNonPositiveEntries",
-        "layer": "DB",
-        "status": "failed",
-        "message": "ledger entries with amount <= 0 ==> expected: <[]> but was: <[TXN776647E22A32, TXN776647E22A32, TXN67EAE481C332, TXN67EAE481C332, OPEN-AB000068, OPEN-AB000068]>"
-      },
-      {
-        "name": "Invalid amounts are rejected and no money moves amount \"-100.00\" \u2192 422 INVALID_AMOUNT, no money moves",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
+        "name": "Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance \"-5.00\" is rejected",
+        "full_name": "com.aryabank.payments.api.AccountsTest.rejectsInvalidOpeningBalance",
         "layer": "API",
         "status": "failed",
         "message": "1 expectation failed."
@@ -186,11 +165,32 @@
         "message": "customer accounts below zero ==> expected: <[]> but was: <[AB000068]>"
       },
       {
-        "name": "Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance \"-5.00\" is rejected",
-        "full_name": "com.aryabank.payments.api.AccountsTest.rejectsInvalidOpeningBalance",
+        "name": "No ledger entry has a zero or negative amount",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNonPositiveEntries",
+        "layer": "DB",
+        "status": "failed",
+        "message": "ledger entries with amount <= 0 ==> expected: <[]> but was: <[TXNDC518933116C, TXNDC518933116C, TXN4A9E322D864B, TXN4A9E322D864B, OPEN-AB000068, OPEN-AB000068]>"
+      },
+      {
+        "name": "Invalid amounts are rejected and no money moves amount \"-100.00\" \u2192 422 INVALID_AMOUNT, no money moves",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
         "layer": "API",
         "status": "failed",
         "message": "1 expectation failed."
+      },
+      {
+        "name": "Invalid amounts are rejected and no money moves amount \"-0.01\" \u2192 422 INVALID_AMOUNT, no money moves",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Invalid amounts are rejected [-100.00]",
+        "full_name": "features/transfers.feature:45",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXND60190AC3C80\",\"from_account\":\"AB000109\",\"to_account\":\"AB000110\",\"amount\":\"-100.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:27:04.525Z\"} ==> expected: <true> but was: <false>"
       }
     ],
     "failed_layers": [
@@ -204,7 +204,7 @@
     "run": "BUG-04",
     "planted_bugs": "BUG-04",
     "maven_exit": 0,
-    "duration_s": 20.9,
+    "duration_s": 18.5,
     "total": 77,
     "passed": 75,
     "failed": 2,
@@ -222,7 +222,7 @@
         "full_name": "features/refunds.feature:18",
         "layer": "BDD",
         "status": "failed",
-        "message": "{\"refund_id\":\"RFDD16D56E4BC9C\",\"transfer_id\":\"TXN14530E13EC1B\",\"amount\":\"200.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"created_at\":\"2026-11-05T02:30:12.575Z\"} ==> expected: <409> but was: <201>"
+        "message": "{\"refund_id\":\"RFDAB98A978BD7D\",\"transfer_id\":\"TXN9C7755054912\",\"amount\":\"200.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"created_at\":\"2026-11-06T02:27:22.411Z\"} ==> expected: <409> but was: <201>"
       }
     ],
     "failed_layers": [
@@ -235,18 +235,32 @@
     "run": "BUG-05",
     "planted_bugs": "BUG-05",
     "maven_exit": 0,
-    "duration_s": 21.7,
+    "duration_s": 18.3,
     "total": 77,
     "passed": 68,
     "failed": 9,
     "skipped": 0,
     "failed_tests": [
       {
-        "name": "Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger",
-        "full_name": "com.aryabank.payments.api.RefundTest.refundLedger",
-        "layer": "DB",
+        "name": "A refund returns the money to the payer",
+        "full_name": "features/refunds.feature:10",
+        "layer": "BDD",
         "status": "failed",
-        "message": "refund should write two ledger entries, got [Entry[txnId=RFD27705688D849, accountId=AB000009, direction=CREDIT, amount=400.00]] ==> expected: <2> but was: <1>"
+        "message": "balance of AB000090 \u2014 expected 500.00 but was 700.00 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "A transfer can't be refunded twice",
+        "full_name": "features/refunds.feature:18",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "balance of AB000092 \u2014 expected 500.00 but was 700.00 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "Refund returns the money and marks the transfer REFUNDED",
+        "full_name": "com.aryabank.payments.api.RefundTest.refundsTransfer",
+        "layer": "API",
+        "status": "failed",
+        "message": "balance of AB000005 \u2014 expected 100.00 but was 400.00 ==> expected: <0> but was: <-1>"
       },
       {
         "name": "A transfer cannot be refunded twice",
@@ -263,11 +277,11 @@
         "message": "payer + payee after refund \u2014 expected 1250.00 but was 1850.00 ==> expected: <0> but was: <-1>"
       },
       {
-        "name": "A transfer can't be refunded twice",
-        "full_name": "features/refunds.feature:18",
-        "layer": "BDD",
+        "name": "Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger",
+        "full_name": "com.aryabank.payments.api.RefundTest.refundLedger",
+        "layer": "DB",
         "status": "failed",
-        "message": "balance of AB000092 \u2014 expected 500.00 but was 700.00 ==> expected: <0> but was: <-1>"
+        "message": "refund should write two ledger entries, got [Entry[txnId=RFDA2C8C4BF3239, accountId=AB000009, direction=CREDIT, amount=400.00]] ==> expected: <2> but was: <1>"
       },
       {
         "name": "A day of payments and a refund leaves the books balanced",
@@ -277,11 +291,11 @@
         "message": "balance of AB000088 \u2014 expected 700.25 but was 800.24 ==> expected: <0> but was: <-1>"
       },
       {
-        "name": "Refund returns the money and marks the transfer REFUNDED",
-        "full_name": "com.aryabank.payments.api.RefundTest.refundsTransfer",
-        "layer": "API",
+        "name": "Every transaction's debits equal its credits",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.everyTransactionBalances",
+        "layer": "DB",
         "status": "failed",
-        "message": "balance of AB000005 \u2014 expected 100.00 but was 400.00 ==> expected: <0> but was: <-1>"
+        "message": "unbalanced transactions ==> expected: <[]> but was: <[RFD6F368A3B6A56, RFDA2C8C4BF3239, RFDB08BD1C4FAC0, RFDB1404C3E297B, RFDBC120F896ECD]>"
       },
       {
         "name": "Money is conserved: all balances (incl. the funding account) sum to 0.00",
@@ -289,20 +303,6 @@
         "layer": "DB",
         "status": "failed",
         "message": "sum of all balances \u2014 expected 0.00 but was 1599.99 ==> expected: <0> but was: <-1>"
-      },
-      {
-        "name": "A refund returns the money to the payer",
-        "full_name": "features/refunds.feature:10",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "balance of AB000090 \u2014 expected 500.00 but was 700.00 ==> expected: <0> but was: <-1>"
-      },
-      {
-        "name": "Every transaction's debits equal its credits",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.everyTransactionBalances",
-        "layer": "DB",
-        "status": "failed",
-        "message": "unbalanced transactions ==> expected: <[]> but was: <[RFD27705688D849, RFD34D9D565B478, RFDC3BEE0AE95DE, RFDC402A2BA9ABB, RFDD652A9BC972F]>"
       }
     ],
     "failed_layers": [
@@ -316,12 +316,26 @@
     "run": "BUG-06",
     "planted_bugs": "BUG-06",
     "maven_exit": 0,
-    "duration_s": 20.8,
+    "duration_s": 18.2,
     "total": 77,
     "passed": 73,
     "failed": 4,
     "skipped": 0,
     "failed_tests": [
+      {
+        "name": "Balance is always a string with exactly two decimals",
+        "full_name": "com.aryabank.payments.api.AccountsTest.balanceIsTwoDecimalString",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Opening an account returns 201 with id, balance, INR and ACTIVE",
+        "full_name": "com.aryabank.payments.api.AccountsTest.opensAccount",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
       {
         "name": "GET /accounts/{id} returns what was opened",
         "full_name": "com.aryabank.payments.api.AccountsTest.readsAccount",
@@ -335,20 +349,6 @@
         "layer": "Contract",
         "status": "failed",
         "message": "arya-mobile-app - Upon a request for an existing account "
-      },
-      {
-        "name": "Opening an account returns 201 with id, balance, INR and ACTIVE",
-        "full_name": "com.aryabank.payments.api.AccountsTest.opensAccount",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Balance is always a string with exactly two decimals",
-        "full_name": "com.aryabank.payments.api.AccountsTest.balanceIsTwoDecimalString",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
       }
     ],
     "failed_layers": [
@@ -361,19 +361,12 @@
     "run": "BUG-07",
     "planted_bugs": "BUG-07",
     "maven_exit": 0,
-    "duration_s": 21.7,
+    "duration_s": 19.9,
     "total": 77,
     "passed": 72,
     "failed": 5,
     "skipped": 0,
     "failed_tests": [
-      {
-        "name": "Every account's stored balance equals credits minus debits in the ledger",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.balancesMatchLedger",
-        "layer": "DB",
-        "status": "failed",
-        "message": "accounts whose balance disagrees with the ledger ==> expected: <[]> but was: <[AB000059, AB000060, AB000061, AB000062, AB000063, AB000064]>"
-      },
       {
         "name": "25 parallel transfers of 10.00: every rupee is accounted for",
         "full_name": "com.aryabank.payments.api.ConcurrencyTest.noLostUpdates",
@@ -382,11 +375,25 @@
         "message": "balance of AB000061 \u2014 expected 750.00 but was 990.00 ==> expected: <0> but was: <-1>"
       },
       {
+        "name": "20 parallel transfers of 10.00 from 100.00: exactly 10 succeed, never negative",
+        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noOverdraftUnderLoad",
+        "layer": "Concurrency",
+        "status": "failed",
+        "message": "successful transfers: [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201] ==> expected: <10> but was: <20>"
+      },
+      {
+        "name": "Every account's stored balance equals credits minus debits in the ledger",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.balancesMatchLedger",
+        "layer": "DB",
+        "status": "failed",
+        "message": "accounts whose balance disagrees with the ledger ==> expected: <[]> but was: <[AB000059, AB000060, AB000061, AB000062, AB000063, AB000064]>"
+      },
+      {
         "name": "After parallel transfers the stored balances still match the ledger",
         "full_name": "com.aryabank.payments.api.ConcurrencyTest.balancesMatchLedger",
         "layer": "Concurrency",
         "status": "failed",
-        "message": "payer drift \u2014 expected 0.00 but was 140.00 ==> expected: <0> but was: <-1>"
+        "message": "payer drift \u2014 expected 0.00 but was 145.00 ==> expected: <0> but was: <-1>"
       },
       {
         "name": "A day of payments and a refund leaves the books balanced",
@@ -394,13 +401,6 @@
         "layer": "BDD",
         "status": "failed",
         "message": "accounts whose balance disagrees with the ledger ==> expected: <[]> but was: <[AB000059, AB000060, AB000061, AB000062, AB000063, AB000064]>"
-      },
-      {
-        "name": "20 parallel transfers of 10.00 from 100.00: exactly 10 succeed, never negative",
-        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noOverdraftUnderLoad",
-        "layer": "Concurrency",
-        "status": "failed",
-        "message": "successful transfers: [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201] ==> expected: <10> but was: <20>"
       }
     ],
     "failed_layers": [
@@ -414,81 +414,18 @@
     "run": "all",
     "planted_bugs": "all",
     "maven_exit": 0,
-    "duration_s": 21.1,
+    "duration_s": 19.6,
     "total": 77,
     "passed": 42,
     "failed": 35,
     "skipped": 0,
     "failed_tests": [
       {
-        "name": "Invalid amounts are rejected and no money moves amount \"-100.00\" \u2192 422 INVALID_AMOUNT, no money moves",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
+        "name": "Retry with the same key returns the original transfer and debits once",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.retryDebitsOnce",
         "layer": "API",
         "status": "failed",
         "message": "1 expectation failed."
-      },
-      {
-        "name": "10 parallel retries with one key create exactly one transfer",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.parallelRetries",
-        "layer": "Concurrency",
-        "status": "failed",
-        "message": "all retries should return the same transfer id, got [TXNB5B8B27F3C16, TXNAC24CC905736, TXN0B5D4109D0F8, TXNA87A5B2FCFAC, TXNCAD44CEE876C, TXN032F2397B5F2, TXN74F6C90C45C8, TXN4CA756F64A2B, TXNAF870EB08C3F, TXN79B6B8577930] ==> expected: <1> but was: <10>"
-      },
-      {
-        "name": "Every account's stored balance equals credits minus debits in the ledger",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.balancesMatchLedger",
-        "layer": "DB",
-        "status": "failed",
-        "message": "accounts whose balance disagrees with the ledger ==> expected: <[]> but was: <[AB000015, AB000016, AB000059, AB000060, AB000061, AB000062, AB000063, AB000064]>"
-      },
-      {
-        "name": "No ledger entry has a zero or negative amount",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNonPositiveEntries",
-        "layer": "DB",
-        "status": "failed",
-        "message": "ledger entries with amount <= 0 ==> expected: <[]> but was: <[TXN572B2EC310BD, TXN572B2EC310BD, TXNC997C53E2AC7, TXNC997C53E2AC7, OPEN-AB000068, OPEN-AB000068]>"
-      },
-      {
-        "name": "Balance is always a string with exactly two decimals",
-        "full_name": "com.aryabank.payments.api.AccountsTest.balanceIsTwoDecimalString",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Same key with a different amount is rejected with 409 and nothing moves",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.sameKeyDifferentBody",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance \"-5.00\" is rejected",
-        "full_name": "com.aryabank.payments.api.AccountsTest.rejectsInvalidOpeningBalance",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "A transfer cannot be refunded twice",
-        "full_name": "com.aryabank.payments.api.RefundTest.noDoubleRefund",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "A transfer can't be refunded twice",
-        "full_name": "features/refunds.feature:18",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "{\"refund_id\":\"RFD7108F69A7CD5\",\"transfer_id\":\"TXND837ABFFF363\",\"amount\":\"200.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"created_at\":\"2026-11-05T02:31:38.131Z\"} ==> expected: <409> but was: <201>"
-      },
-      {
-        "name": "Refund does not create money: payer + payee total is unchanged",
-        "full_name": "com.aryabank.payments.api.RefundTest.refundConservesMoney",
-        "layer": "DB",
-        "status": "failed",
-        "message": "payer + payee after refund \u2014 expected 1250.00 but was 1850.00 ==> expected: <0> but was: <-1>"
       },
       {
         "name": "Money is conserved: all balances (incl. the funding account) sum to 0.00",
@@ -498,81 +435,11 @@
         "message": "sum of all balances \u2014 expected 0.00 but was 1799.99 ==> expected: <0> but was: <-1>"
       },
       {
-        "name": "A retried payment is charged once",
-        "full_name": "features/idempotency.feature:10",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "a retry with the same key must return the original transfer ==> expected: <TXND2E5BCB361A7> but was: <TXN307D648C8063>"
-      },
-      {
-        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 0.00, send 0.01 \u2192 422 INSUFFICIENT_FUNDS",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Opening an account returns 201 with id, balance, INR and ACTIVE",
-        "full_name": "com.aryabank.payments.api.AccountsTest.opensAccount",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.90]",
-        "full_name": "features/transfers.feature:34",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNF004D4C05632\",\"from_account\":\"AB000103\",\"to_account\":\"AB000102\",\"amount\":\"500.90\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:31:38.601Z\"} ==> expected: <true> but was: <false>"
-      },
-      {
-        "name": "Refund returns the money and marks the transfer REFUNDED",
-        "full_name": "com.aryabank.payments.api.RefundTest.refundsTransfer",
-        "layer": "API",
-        "status": "failed",
-        "message": "balance of AB000005 \u2014 expected 100.00 but was 400.0 ==> expected: <0> but was: <-1>"
-      },
-      {
-        "name": "25 parallel transfers of 10.00: every rupee is accounted for",
-        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noLostUpdates",
-        "layer": "Concurrency",
-        "status": "failed",
-        "message": "balance of AB000061 \u2014 expected 750.00 but was 990.0 ==> expected: <0> but was: <-1>"
-      },
-      {
-        "name": "A day of payments and a refund leaves the books balanced",
-        "full_name": "features/ledger.feature:6",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "balance of AB000089 \u2014 expected 700.25 but was 800.24 ==> expected: <0> but was: <-1>"
-      },
-      {
-        "name": "Retry with the same key returns the original transfer and debits once",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.retryDebitsOnce",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
-      },
-      {
-        "name": "Invalid amounts are rejected [-100.00]",
-        "full_name": "features/transfers.feature:45",
-        "layer": "BDD",
-        "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN6FA6DD3A6568\",\"from_account\":\"AB000109\",\"to_account\":\"AB000110\",\"amount\":\"-100.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:31:38.881Z\"} ==> expected: <true> but was: <false>"
-      },
-      {
-        "name": "A retried request leaves exactly one transfer row in the database",
-        "full_name": "com.aryabank.payments.api.IdempotencyTest.oneRowInDb",
+        "name": "No customer account is negative",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNegativeBalances",
         "layer": "DB",
         "status": "failed",
-        "message": "transfer rows for the retried payment ==> expected: <1> but was: <3>"
-      },
-      {
-        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.90 \u2192 422 INSUFFICIENT_FUNDS",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
-        "layer": "API",
-        "status": "failed",
-        "message": "1 expectation failed."
+        "message": "customer accounts below zero ==> expected: <[]> but was: <[AB000027, AB000029, AB000031, AB000068]>"
       },
       {
         "name": "GET /accounts/{id} returns what was opened",
@@ -582,25 +449,25 @@
         "message": "1 expectation failed."
       },
       {
-        "name": "A key can't be reused for a different payment",
-        "full_name": "features/idempotency.feature:18",
+        "name": "Invalid amounts are rejected [-100.00]",
+        "full_name": "features/transfers.feature:45",
         "layer": "BDD",
         "status": "failed",
-        "message": "expected: <IDEMPOTENCY_CONFLICT> but was: <INSUFFICIENT_FUNDS>"
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNA1127439DF55\",\"from_account\":\"AB000109\",\"to_account\":\"AB000110\",\"amount\":\"-100.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:28:39.174Z\"} ==> expected: <true> but was: <false>"
       },
       {
-        "name": "Invalid amounts are rejected and no money moves amount \"-0.01\" \u2192 422 INVALID_AMOUNT, no money moves",
-        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
-        "layer": "API",
+        "name": "verify(PactVerificationContext) arya-mobile-app - a request for an existing account",
+        "full_name": "com.aryabank.payments.contract.PaymentsProviderPactIT.verify",
+        "layer": "Contract",
         "status": "failed",
-        "message": "1 expectation failed."
+        "message": "arya-mobile-app - Upon a request for an existing account "
       },
       {
-        "name": "No customer account is negative",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNegativeBalances",
+        "name": "A retried request leaves exactly one transfer row in the database",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.oneRowInDb",
         "layer": "DB",
         "status": "failed",
-        "message": "customer accounts below zero ==> expected: <[]> but was: <[AB000027, AB000029, AB000031, AB000068]>"
+        "message": "transfer rows for the retried payment ==> expected: <1> but was: <3>"
       },
       {
         "name": "After parallel transfers the stored balances still match the ledger",
@@ -614,35 +481,98 @@
         "full_name": "features/transfers.feature:35",
         "layer": "BDD",
         "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN5C3E0A1E4559\",\"from_account\":\"AB000106\",\"to_account\":\"AB000105\",\"amount\":\"0.01\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:31:38.714Z\"} ==> expected: <true> but was: <false>"
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN987EFE17BC07\",\"from_account\":\"AB000106\",\"to_account\":\"AB000105\",\"amount\":\"0.01\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:28:39.011Z\"} ==> expected: <true> but was: <false>"
       },
       {
-        "name": "verify(PactVerificationContext) arya-mobile-app - a request for an existing account",
-        "full_name": "com.aryabank.payments.contract.PaymentsProviderPactIT.verify",
-        "layer": "Contract",
-        "status": "failed",
-        "message": "arya-mobile-app - Upon a request for an existing account "
-      },
-      {
-        "name": "Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger",
-        "full_name": "com.aryabank.payments.api.RefundTest.refundLedger",
-        "layer": "DB",
-        "status": "failed",
-        "message": "refund should write two ledger entries, got [Entry[txnId=RFDC89DA1738DD6, accountId=AB000009, direction=CREDIT, amount=400.00]] ==> expected: <2> but was: <1>"
-      },
-      {
-        "name": "20 parallel transfers of 10.00 from 100.00: exactly 10 succeed, never negative",
-        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noOverdraftUnderLoad",
-        "layer": "Concurrency",
-        "status": "failed",
-        "message": "successful transfers: [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201] ==> expected: <10> but was: <20>"
-      },
-      {
-        "name": "A refund returns the money to the payer",
-        "full_name": "features/refunds.feature:10",
+        "name": "A day of payments and a refund leaves the books balanced",
+        "full_name": "features/ledger.feature:6",
         "layer": "BDD",
         "status": "failed",
-        "message": "balance of AB000091 \u2014 expected 500.00 but was 700.0 ==> expected: <0> but was: <-1>"
+        "message": "balance of AB000089 \u2014 expected 700.25 but was 800.24 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "A transfer can't be refunded twice",
+        "full_name": "features/refunds.feature:18",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "{\"refund_id\":\"RFD26750D523CB6\",\"transfer_id\":\"TXN9EF15ECC89FE\",\"amount\":\"200.00\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"created_at\":\"2026-11-06T02:28:38.493Z\"} ==> expected: <409> but was: <201>"
+      },
+      {
+        "name": "Same key with a different amount is rejected with 409 and nothing moves",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.sameKeyDifferentBody",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Refund returns the money and marks the transfer REFUNDED",
+        "full_name": "com.aryabank.payments.api.RefundTest.refundsTransfer",
+        "layer": "API",
+        "status": "failed",
+        "message": "balance of AB000005 \u2014 expected 100.00 but was 400.0 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "No ledger entry has a zero or negative amount",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.noNonPositiveEntries",
+        "layer": "DB",
+        "status": "failed",
+        "message": "ledger entries with amount <= 0 ==> expected: <[]> but was: <[TXN8348938AD4EC, TXN8348938AD4EC, TXN29032C69E6E5, TXN29032C69E6E5, OPEN-AB000068, OPEN-AB000068]>"
+      },
+      {
+        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]",
+        "full_name": "features/transfers.feature:33",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN0DA3E1F82F10\",\"from_account\":\"AB000100\",\"to_account\":\"AB000099\",\"amount\":\"500.51\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:28:38.816Z\"} ==> expected: <true> but was: <false>"
+      },
+      {
+        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.90 \u2192 422 INSUFFICIENT_FUNDS",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Invalid amounts are rejected and no money moves amount \"-0.01\" \u2192 422 INVALID_AMOUNT, no money moves",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.90]",
+        "full_name": "features/transfers.feature:34",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXNBEBF3CD2915A\",\"from_account\":\"AB000103\",\"to_account\":\"AB000102\",\"amount\":\"500.90\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-06T02:28:38.915Z\"} ==> expected: <true> but was: <false>"
+      },
+      {
+        "name": "Opening an account returns 201 with id, balance, INR and ACTIVE",
+        "full_name": "com.aryabank.payments.api.AccountsTest.opensAccount",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "A transfer cannot be refunded twice",
+        "full_name": "com.aryabank.payments.api.RefundTest.noDoubleRefund",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "A key can't be reused for a different payment",
+        "full_name": "features/idempotency.feature:18",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "expected: <IDEMPOTENCY_CONFLICT> but was: <INSUFFICIENT_FUNDS>"
+      },
+      {
+        "name": "Every transaction's debits equal its credits",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.everyTransactionBalances",
+        "layer": "DB",
+        "status": "failed",
+        "message": "unbalanced transactions ==> expected: <[]> but was: <[RFD1D94B4E937BC, RFD227B7DD61276, RFD3A34AF0CC19D, RFD6E65A41F213F, RFD8701F3853096, RFDD5B20F60C675]>"
       },
       {
         "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 500.50, send 500.51 \u2192 422 INSUFFICIENT_FUNDS",
@@ -652,18 +582,88 @@
         "message": "1 expectation failed."
       },
       {
-        "name": "A transfer the payer can't afford is rejected and nothing moves [500.50, 500.51]",
-        "full_name": "features/transfers.feature:33",
-        "layer": "BDD",
+        "name": "10 parallel retries with one key create exactly one transfer",
+        "full_name": "com.aryabank.payments.api.IdempotencyTest.parallelRetries",
+        "layer": "Concurrency",
         "status": "failed",
-        "message": "expected a 4xx, got 201 {\"transfer_id\":\"TXN91DC08A04C75\",\"from_account\":\"AB000100\",\"to_account\":\"AB000099\",\"amount\":\"500.51\",\"currency\":\"INR\",\"status\":\"COMPLETED\",\"remarks\":null,\"refund_id\":null,\"created_at\":\"2026-11-05T02:31:38.497Z\"} ==> expected: <true> but was: <false>"
+        "message": "all retries should return the same transfer id, got [TXN53D8522CC812, TXNC0447422F013, TXND49D34988FB1, TXNEBC882B83786, TXN91254CA934D4, TXN6883D03C71E3, TXN19488295339B, TXNF7A40F942F54, TXNF36229141C9B, TXN8CC3E57FDB36] ==> expected: <1> but was: <10>"
       },
       {
-        "name": "Every transaction's debits equal its credits",
-        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.everyTransactionBalances",
+        "name": "Invalid amounts are rejected and no money moves amount \"-100.00\" \u2192 422 INVALID_AMOUNT, no money moves",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInvalidAmounts",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Invalid opening balances are rejected with 422 INVALID_AMOUNT opening_balance \"-5.00\" is rejected",
+        "full_name": "com.aryabank.payments.api.AccountsTest.rejectsInvalidOpeningBalance",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "20 parallel transfers of 10.00 from 100.00: exactly 10 succeed, never negative",
+        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noOverdraftUnderLoad",
+        "layer": "Concurrency",
+        "status": "failed",
+        "message": "successful transfers: [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 201] ==> expected: <10> but was: <20>"
+      },
+      {
+        "name": "Insufficient funds is rejected at the paisa boundary and no money moves balance 0.00, send 0.01 \u2192 422 INSUFFICIENT_FUNDS",
+        "full_name": "com.aryabank.payments.api.TransferValidationTest.rejectsInsufficientFunds",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "Every account's stored balance equals credits minus debits in the ledger",
+        "full_name": "com.aryabank.payments.db.LedgerIntegrityTest.balancesMatchLedger",
         "layer": "DB",
         "status": "failed",
-        "message": "unbalanced transactions ==> expected: <[]> but was: <[RFD0B7FC609B32D, RFD32E50083AF94, RFD3E87F9FA461F, RFD984F9AD07E81, RFDC89DA1738DD6, RFDE5801CBF0752]>"
+        "message": "accounts whose balance disagrees with the ledger ==> expected: <[]> but was: <[AB000015, AB000016, AB000059, AB000060, AB000061, AB000062, AB000063, AB000064]>"
+      },
+      {
+        "name": "Refund writes a balanced DEBIT (receiver) and CREDIT (payer) in the ledger",
+        "full_name": "com.aryabank.payments.api.RefundTest.refundLedger",
+        "layer": "DB",
+        "status": "failed",
+        "message": "refund should write two ledger entries, got [Entry[txnId=RFD3A34AF0CC19D, accountId=AB000009, direction=CREDIT, amount=400.00]] ==> expected: <2> but was: <1>"
+      },
+      {
+        "name": "25 parallel transfers of 10.00: every rupee is accounted for",
+        "full_name": "com.aryabank.payments.api.ConcurrencyTest.noLostUpdates",
+        "layer": "Concurrency",
+        "status": "failed",
+        "message": "balance of AB000061 \u2014 expected 750.00 but was 980.0 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "A refund returns the money to the payer",
+        "full_name": "features/refunds.feature:10",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "balance of AB000091 \u2014 expected 500.00 but was 700.0 ==> expected: <0> but was: <-1>"
+      },
+      {
+        "name": "Balance is always a string with exactly two decimals",
+        "full_name": "com.aryabank.payments.api.AccountsTest.balanceIsTwoDecimalString",
+        "layer": "API",
+        "status": "failed",
+        "message": "1 expectation failed."
+      },
+      {
+        "name": "A retried payment is charged once",
+        "full_name": "features/idempotency.feature:10",
+        "layer": "BDD",
+        "status": "failed",
+        "message": "a retry with the same key must return the original transfer ==> expected: <TXNCF6EAE3D234B> but was: <TXND7851D58C5E7>"
+      },
+      {
+        "name": "Refund does not create money: payer + payee total is unchanged",
+        "full_name": "com.aryabank.payments.api.RefundTest.refundConservesMoney",
+        "layer": "DB",
+        "status": "failed",
+        "message": "payer + payee after refund \u2014 expected 1250.00 but was 1850.00 ==> expected: <0> but was: <-1>"
       }
     ],
     "failed_layers": [
